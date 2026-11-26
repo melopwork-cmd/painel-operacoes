@@ -2,7 +2,7 @@ import { StrictMode, useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { incidents } from './incidents.ts';
 import {
-  orderFromQuery, orderIncidents, dailyCounts, dateLabel, defaultFilters, exportCsv, filterIncidents, filtersFromQuery,
+  incidentFromQuery, orderFromQuery, orderIncidents, dailyCounts, dateLabel, defaultFilters, exportCsv, filterIncidents, filtersFromQuery,
   phases, queryWithFilters, services, severities, snapshot,
 } from './model.ts';
 import type { Filters, Incident } from './model.ts';
@@ -33,23 +33,24 @@ function Details({ incident, onClose }: { incident: Incident; onClose: () => voi
 function App() {
   const [filters, setFilters] = useState<Filters>(() => filtersFromQuery(window.location.search));
   const [order, setOrder] = useState(() => orderFromQuery(window.location.search));
-  const [selected, setSelected] = useState<Incident | null>(null);
+  const [selected, setSelected] = useState(() => incidentFromQuery(window.location.search, incidents));
   useEffect(() => {
     const onNavigate = () => {
       setFilters(filtersFromQuery(window.location.search));
       setOrder(orderFromQuery(window.location.search));
+      setSelected(incidentFromQuery(window.location.search, incidents));
     };
     window.addEventListener('popstate', onNavigate);
     return () => window.removeEventListener('popstate', onNavigate);
   }, []);
 
   useEffect(() => {
-    const next = queryWithFilters(window.location.search, filters, order);
+    const next = queryWithFilters(window.location.search, filters, order, selected?.id ?? null);
     if (next !== window.location.search) {
       const route = window.location.pathname + next + window.location.hash;
       window.history.replaceState(window.history.state, '', route);
     }
-  }, [filters, order]);
+  }, [filters, order, selected]);
 
   const hasFilters = (Object.keys(defaultFilters) as (keyof Filters)[])
     .some(key => filters[key] !== defaultFilters[key]);
