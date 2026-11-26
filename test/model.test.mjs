@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { incidents } from '../src/incidents.ts';
-import { dailyCounts, exportCsv, filterIncidents } from '../src/model.ts';
+import { dailyCounts, defaultFilters, exportCsv, filterIncidents, filtersFromQuery, queryWithFilters } from '../src/model.ts';
 
 const options = { days: 14, phase: 'all', service: 'all', search: '' };
 
@@ -22,6 +22,14 @@ test('chart preserves zero days and separates the resolved count', () => {
   assert.equal(result.length, 14);
   assert(result.some(day => day.total === 0));
   assert.deepEqual(result.at(-1), { date: '2026-11-26', total: 3, resolved: 1 });
+});
+
+test('shareable filters round-trip and clearing them preserves other parameters', () => {
+  const filters = { days: 7, phase: 'open', service: 'API pública', search: 'latência' };
+  const query = queryWithFilters('?utm_source=portfolio', filters);
+  assert.deepEqual(filtersFromQuery(query), filters);
+  assert.equal(queryWithFilters(query, defaultFilters), '?utm_source=portfolio');
+  assert.deepEqual(filtersFromQuery('?dias=90&status=constructor&servico=unknown'), defaultFilters);
 });
 
 test('CSV escapes quotes and neutralizes cells interpreted as spreadsheet formulas', () => {
