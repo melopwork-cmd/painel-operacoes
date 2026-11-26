@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { incidents } from '../src/incidents.ts';
-import { dailyCounts, defaultFilters, exportCsv, filterIncidents, filtersFromQuery, queryWithFilters } from '../src/model.ts';
+import { orderIncidents, dailyCounts, defaultFilters, exportCsv, filterIncidents, filtersFromQuery, queryWithFilters } from '../src/model.ts';
 
 const options = { days: 14, phase: 'all', service: 'all', search: '' };
 
@@ -36,4 +36,16 @@ test('CSV escapes quotes and neutralizes cells interpreted as spreadsheet formul
   const csv = exportCsv([{ ...incidents[0], title: ' =2+2;"x"' }]);
   assert(csv.startsWith('\ufeff"ID";"Incidente"'));
   assert(csv.includes("\"' =2+2;\"\"x\"\"\""));
+});
+
+test('incident order supports oldest first and severity without mutating the input', () => {
+  const rows = [
+    { ...incidents[0], id: 'latest-major', date: '2026-11-26', severity: 'major' },
+    { ...incidents[0], id: 'latest-critical', date: '2026-11-26', severity: 'critical' },
+    { ...incidents[0], id: 'older-critical', date: '2026-11-23', severity: 'critical' },
+  ];
+  assert.equal(orderIncidents(rows, 'oldest')[0].id, 'older-critical');
+  assert.deepEqual(orderIncidents(rows, 'severity').map(row => row.id),
+    ['latest-critical', 'older-critical', 'latest-major']);
+  assert.equal(rows[0].id, 'latest-major');
 });

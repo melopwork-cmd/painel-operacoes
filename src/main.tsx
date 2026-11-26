@@ -2,7 +2,7 @@ import { StrictMode, useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { incidents } from './incidents.ts';
 import {
-  dailyCounts, dateLabel, defaultFilters, exportCsv, filterIncidents, filtersFromQuery,
+  orderIncidents, dailyCounts, dateLabel, defaultFilters, exportCsv, filterIncidents, filtersFromQuery,
   phases, queryWithFilters, services, severities, snapshot,
 } from './model.ts';
 import type { Filters, Incident } from './model.ts';
@@ -32,6 +32,7 @@ function Details({ incident, onClose }: { incident: Incident; onClose: () => voi
 
 function App() {
   const [filters, setFilters] = useState<Filters>(() => filtersFromQuery(window.location.search));
+  const [order, setOrder] = useState<Parameters<typeof orderIncidents>[1]>('newest');
   const [selected, setSelected] = useState<Incident | null>(null);
   useEffect(() => {
     const onNavigate = () => setFilters(filtersFromQuery(window.location.search));
@@ -47,7 +48,7 @@ function App() {
     }
   }, [filters]);
 
-  const rows = filterIncidents(incidents, filters);
+  const rows = orderIncidents(filterIncidents(incidents, filters), order);
   const trend = dailyCounts(rows, filters.days);
   const max = Math.max(1, ...trend.map(day => day.total));
   const metrics = [
@@ -143,6 +144,15 @@ function App() {
               <select aria-label="Serviço" value={filters.service} onChange={event => update('service', event.target.value as Filters['service'])}>
                 <option value="all">Todos os serviços</option>
                 {services.map(service => <option key={service} value={service}>{service}</option>)}
+              </select>
+            </label>
+          </div>
+          <div className="table-controls">
+            <label>Ordenar por
+              <select value={order} onChange={event => setOrder(event.target.value as typeof order)}>
+                <option value="newest">Mais recentes</option>
+                <option value="oldest">Mais antigos</option>
+                <option value="severity">Severidade</option>
               </select>
             </label>
           </div>

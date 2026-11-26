@@ -1,4 +1,5 @@
 export type Severity = 'critical' | 'major' | 'minor';
+export type IncidentOrder = 'newest' | 'oldest' | 'severity';
 export type Phase = 'open' | 'monitoring' | 'resolved';
 export type Service = 'Pagamentos' | 'API pública' | 'Identidade' | 'Notificações';
 
@@ -67,6 +68,16 @@ export function filterIncidents(incidents: Incident[], filters: Filters) {
     .filter(item => filters.service === 'all' || item.service === filters.service)
     .filter(item => !query || clean([item.id, item.title, item.service].join(' ')).includes(query))
     .sort((a, b) => b.date.localeCompare(a.date) || b.id.localeCompare(a.id));
+}
+
+export function orderIncidents(rows: Incident[], order: IncidentOrder) {
+  const severityRank = { critical: 0, major: 1, minor: 2 };
+  return [...rows].sort((a, b) => {
+    const newestFirst = b.date.localeCompare(a.date) || b.id.localeCompare(a.id);
+    if (order === 'oldest') return -newestFirst;
+    if (order === 'severity') return severityRank[a.severity] - severityRank[b.severity] || newestFirst;
+    return newestFirst;
+  });
 }
 
 export function dailyCounts(incidents: Incident[], days = 7) {
