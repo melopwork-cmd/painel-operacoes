@@ -6,6 +6,7 @@ import {
   phases, queryWithFilters, services, severities, snapshot,
 } from './model.ts';
 import type { Filters, Incident } from './model.ts';
+import { countByService } from './service-breakdown.ts';
 import './style.css';
 
 function Details({ incident, onClose }: { incident: Incident; onClose: () => void }) {
@@ -55,6 +56,7 @@ function App() {
     .some(key => filters[key] !== defaultFilters[key]);
   const rows = orderIncidents(filterIncidents(incidents, filters), order);
   const trend = dailyCounts(rows, filters.days);
+  const serviceBreakdown = countByService(rows);
   const max = Math.max(1, ...trend.map(day => day.total));
   const metrics = [
     { label: 'Incidentes abertos', count: rows.filter(row => row.phase === 'open').length, theme: 'warm' },
@@ -128,6 +130,18 @@ function App() {
             })}
           </ol>
         </section>
+
+        {serviceBreakdown.length > 0 && <section className="card" aria-labelledby="service-title">
+          <div className="card-heading"><h2 id="service-title">Incidentes por serviço</h2></div>
+          <ul className="service-breakdown">
+            {serviceBreakdown.map(({ service, total, active }) => (
+              <li key={service}>
+                <span>{service}<small>{active} em andamento</small></span>
+                <strong>{total}</strong>
+              </li>
+            ))}
+          </ul>
+        </section>}
 
         <section className="card" id="incidentes" aria-labelledby="incident-title">
           <div className="card-heading">
