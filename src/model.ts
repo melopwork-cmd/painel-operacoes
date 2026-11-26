@@ -15,7 +15,7 @@ export type Incident = {
 
 export type Filters = {
   days: 7 | 14 | 30;
-  phase: Phase | 'all';
+  phase: Phase | 'all' | 'active';
   severity: Severity | 'all';
   service: Service | 'all';
   search: string;
@@ -35,7 +35,7 @@ export function filtersFromQuery(query: string): Filters {
   const service = services.find(value => value === params.get('servico'));
   return {
     days: days === 7 || days === 14 || days === 30 ? days : defaultFilters.days,
-    phase: Object.hasOwn(phases, phase) ? phase as Phase : defaultFilters.phase,
+    phase: phase === 'active' || Object.hasOwn(phases, phase) ? phase as Phase | 'active' : defaultFilters.phase,
     severity: Object.hasOwn(severities, severity) ? severity as Severity : defaultFilters.severity,
     service: service ?? defaultFilters.service,
     search: params.get('q') ?? defaultFilters.search,
@@ -74,7 +74,8 @@ export function filterIncidents(incidents: Incident[], filters: Filters) {
   const terms = clean(filters.search).split(/\s+/u).filter(Boolean);
   return incidents
     .filter(item => parseDay(item.date) >= start && parseDay(item.date) <= end)
-    .filter(item => filters.phase === 'all' || item.phase === filters.phase)
+    .filter(item => filters.phase === 'all' ||
+      (filters.phase === 'active' ? item.phase !== 'resolved' : item.phase === filters.phase))
     .filter(item => filters.severity === 'all' || item.severity === filters.severity)
     .filter(item => filters.service === 'all' || item.service === filters.service)
     .filter(item => {

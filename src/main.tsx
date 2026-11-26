@@ -145,6 +145,7 @@ function App() {
             <label>Status
               <select aria-label="Status" value={filters.phase} onChange={event => update('phase', event.target.value as Filters['phase'])}>
                 <option value="all">Todos os status</option>
+                <option value="active">Em andamento</option>
                 {Object.entries(phases).map(([key, label]) => <option key={key} value={key}>{label}</option>)}
               </select>
             </label>

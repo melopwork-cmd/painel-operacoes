@@ -28,4 +28,4 @@ An incident operations dashboard with Brazilian Portuguese localization, respons
 - [React](https://react.dev/)
 - [Vite](https://vite.dev/)
 
-O botão **Limpar filtros** restaura todos os filtros de incidentes e o período inicial.
+O botão **Limpar filtros** restaura todos os filtros de incidentes e o período inicial. O status **Em andamento** inclui incidentes abertos e em monitoramento.
