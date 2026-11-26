@@ -73,3 +73,13 @@ test('shared ordering round-trips and preserves unrelated URL parameters', () =>
   assert.equal(queryWithFilters(query, defaultFilters, 'newest'), '?origem=portfolio');
   assert.equal(orderFromQuery('?ordem=invalida'), 'newest');
 });
+
+test('service order groups services and keeps the newest incident first in each group', () => {
+  const rows = [
+    { ...incidents[0], id: 'p', service: 'Pagamentos' },
+    { ...incidents[0], id: 'a1', service: 'API pública', date: '2026-11-23' },
+    { ...incidents[0], id: 'a2', service: 'API pública', date: '2026-11-26' },
+  ];
+  const query = queryWithFilters('', defaultFilters, 'service');
+  assert.deepEqual(orderIncidents(rows, orderFromQuery(query)).map(row => row.id), ['a2', 'a1', 'p']);
+});

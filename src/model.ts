@@ -1,5 +1,5 @@
 export type Severity = 'critical' | 'major' | 'minor';
-export type IncidentOrder = 'newest' | 'oldest' | 'severity';
+export type IncidentOrder = 'newest' | 'oldest' | 'severity' | 'service';
 export type Phase = 'open' | 'monitoring' | 'resolved';
 export type Service = 'Pagamentos' | 'API pública' | 'Identidade' | 'Notificações';
 
@@ -44,7 +44,7 @@ export function filtersFromQuery(query: string): Filters {
 
 export function orderFromQuery(query: string): IncidentOrder {
   const order = new URLSearchParams(query).get('ordem');
-  return order === 'oldest' || order === 'severity' ? order : 'newest';
+  return order === 'oldest' || order === 'severity' || order === 'service' ? order : 'newest';
 }
 
 export function queryWithFilters(query: string, filters: Filters, order?: IncidentOrder): string {
@@ -90,6 +90,7 @@ export function orderIncidents(rows: Incident[], order: IncidentOrder) {
   return [...rows].sort((a, b) => {
     const newestFirst = b.date.localeCompare(a.date) || b.id.localeCompare(a.id);
     if (order === 'oldest') return -newestFirst;
+    if (order === 'service') return a.service.localeCompare(b.service, 'pt-BR') || newestFirst;
     if (order === 'severity') return severityRank[a.severity] - severityRank[b.severity] || newestFirst;
     return newestFirst;
   });
