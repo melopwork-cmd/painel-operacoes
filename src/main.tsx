@@ -48,6 +48,8 @@ function App() {
     }
   }, [filters]);
 
+  const hasFilters = (Object.keys(defaultFilters) as (keyof Filters)[])
+    .some(key => filters[key] !== defaultFilters[key]);
   const rows = orderIncidents(filterIncidents(incidents, filters), order);
   const trend = dailyCounts(rows, filters.days);
   const max = Math.max(1, ...trend.map(day => day.total));
@@ -127,7 +129,10 @@ function App() {
         <section className="card" id="incidentes" aria-labelledby="incident-title">
           <div className="card-heading">
             <h2 id="incident-title">Incidentes</h2>
-            <button className="secondary" type="button" disabled={rows.length === 0} onClick={download}>Exportar CSV</button>
+            <div className="table-actions">
+              {hasFilters && <button className="secondary" type="button" onClick={() => setFilters(defaultFilters)}>Limpar filtros</button>}
+              <button className="secondary" type="button" disabled={rows.length === 0} onClick={download}>Exportar CSV</button>
+            </div>
           </div>
           <div className="filters">
             <label className="search">Buscar
@@ -183,7 +188,7 @@ function App() {
                 </tbody>
               </table>
             </div>
-          ) : <div className="empty"><p>Nenhum incidente encontrado.</p><button className="secondary" type="button" onClick={() => setFilters(defaultFilters)}>Limpar filtros</button></div>}
+          ) : <div className="empty"><p>Nenhum incidente encontrado.</p></div>}
           <p className="results" aria-live="polite">{rows.length === 1 ? '1 incidente' : rows.length + ' incidentes'}</p>
         </section>
       </main>

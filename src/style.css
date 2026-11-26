@@ -89,3 +89,5 @@ dialog > p { color: #415c65; line-height: 1.55; }
 .table-controls { display: flex; justify-content: flex-end; padding: 0 20px 16px; }
 .table-controls label { display: grid; gap: 5px; }
 @media (max-width: 610px) { .table-controls { padding-inline: 12px; } }
+
+.table-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }

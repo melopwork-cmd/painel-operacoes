@@ -56,6 +56,7 @@ test('severity narrows results and persists in a shared link', () => {
   assert(rows.length > 0);
   assert(rows.every(row => row.severity === 'critical'));
   assert.equal(queryWithFilters('', filters), '?severidade=critical');
+  assert.equal(queryWithFilters('?severidade=critical&origem=portfolio', defaultFilters), '?origem=portfolio');
   assert.equal(filtersFromQuery('?severidade=invalid').severity, 'all');
 });
 
