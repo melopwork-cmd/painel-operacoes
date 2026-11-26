@@ -52,7 +52,7 @@ input, select { width: 100%; min-height: 41px; border: 1px solid #bccdd0; border
 .secondary { cursor: pointer; border-radius: 8px; border: 1px solid #c3d2d3; background: white; padding: 8px 12px; color: #245661; font-weight: 650; }
 .secondary:hover { background: #f1f8f7; }
 .secondary:disabled { opacity: .55; cursor: not-allowed; }
-.filters { padding: 0 20px 16px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(140px, .45fr) minmax(140px, .45fr); gap: 12px; }
+.filters { padding: 0 20px 16px; display: grid; grid-template-columns: minmax(0, 1fr) repeat(3, minmax(0, .52fr)); gap: 12px; }
 .table-overflow { overflow-x: auto; }
 table { border-collapse: collapse; width: 100%; min-width: 685px; font-size: 14px; }
 th, td { padding: 11px 12px; text-align: left; border-bottom: 1px solid #e5eded; white-space: nowrap; }
