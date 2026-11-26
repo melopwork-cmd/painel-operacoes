@@ -167,6 +167,7 @@ function App() {
                 <option value="newest">Mais recentes</option>
                 <option value="oldest">Mais antigos</option>
                 <option value="severity">Severidade</option>
+                <option value="service">Serviço</option>
               </select>
             </label>
           </div>
