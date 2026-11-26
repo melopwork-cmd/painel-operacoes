@@ -2,7 +2,7 @@ import { StrictMode, useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { incidents } from './incidents.ts';
 import {
-  orderIncidents, dailyCounts, dateLabel, defaultFilters, exportCsv, filterIncidents, filtersFromQuery,
+  orderFromQuery, orderIncidents, dailyCounts, dateLabel, defaultFilters, exportCsv, filterIncidents, filtersFromQuery,
   phases, queryWithFilters, services, severities, snapshot,
 } from './model.ts';
 import type { Filters, Incident } from './model.ts';
@@ -32,21 +32,24 @@ function Details({ incident, onClose }: { incident: Incident; onClose: () => voi
 
 function App() {
   const [filters, setFilters] = useState<Filters>(() => filtersFromQuery(window.location.search));
-  const [order, setOrder] = useState<Parameters<typeof orderIncidents>[1]>('newest');
+  const [order, setOrder] = useState(() => orderFromQuery(window.location.search));
   const [selected, setSelected] = useState<Incident | null>(null);
   useEffect(() => {
-    const onNavigate = () => setFilters(filtersFromQuery(window.location.search));
+    const onNavigate = () => {
+      setFilters(filtersFromQuery(window.location.search));
+      setOrder(orderFromQuery(window.location.search));
+    };
     window.addEventListener('popstate', onNavigate);
     return () => window.removeEventListener('popstate', onNavigate);
   }, []);
 
   useEffect(() => {
-    const next = queryWithFilters(window.location.search, filters);
+    const next = queryWithFilters(window.location.search, filters, order);
     if (next !== window.location.search) {
       const route = window.location.pathname + next + window.location.hash;
       window.history.replaceState(window.history.state, '', route);
     }
-  }, [filters]);
+  }, [filters, order]);
 
   const rows = orderIncidents(filterIncidents(incidents, filters), order);
   const trend = dailyCounts(rows, filters.days);

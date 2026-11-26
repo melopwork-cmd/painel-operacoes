@@ -42,13 +42,20 @@ export function filtersFromQuery(query: string): Filters {
   };
 }
 
-export function queryWithFilters(query: string, filters: Filters): string {
+export function orderFromQuery(query: string): IncidentOrder {
+  const order = new URLSearchParams(query).get('ordem');
+  return order === 'oldest' || order === 'severity' ? order : 'newest';
+}
+
+export function queryWithFilters(query: string, filters: Filters, order?: IncidentOrder): string {
   const params = new URLSearchParams(query);
   const keys = { days: 'dias', phase: 'status', severity: 'severidade', service: 'servico', search: 'q' } as const;
   for (const key of Object.keys(keys) as (keyof Filters)[]) {
     if (filters[key] === defaultFilters[key]) params.delete(keys[key]);
     else params.set(keys[key], String(filters[key]));
   }
+  if (order === 'newest') params.delete('ordem');
+  else if (order) params.set('ordem', order);
   const search = params.toString();
   return search ? '?' + search : '';
 }

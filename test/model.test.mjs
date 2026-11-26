@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { incidents } from '../src/incidents.ts';
-import { orderIncidents, dailyCounts, defaultFilters, exportCsv, filterIncidents, filtersFromQuery, queryWithFilters } from '../src/model.ts';
+import { orderFromQuery, orderIncidents, dailyCounts, defaultFilters, exportCsv, filterIncidents, filtersFromQuery, queryWithFilters } from '../src/model.ts';
 
 const options = defaultFilters;
 
@@ -63,4 +63,12 @@ test('search matches all terms across separate incident fields', () => {
   const example = { ...incidents[0], title: 'Falha', summary: 'Conexão instável no banco' };
   assert.deepEqual(filterIncidents([example], { ...defaultFilters, search: 'instavel   FALHA' }), [example]);
   assert.deepEqual(filterIncidents([example], { ...defaultFilters, search: 'instável desconhecido' }), []);
+});
+
+test('shared ordering round-trips and preserves unrelated URL parameters', () => {
+  const query = queryWithFilters('?origem=portfolio', { ...defaultFilters, days: 7 }, 'severity');
+  assert.equal(filtersFromQuery(query).days, 7);
+  assert.equal(orderFromQuery(query), 'severity');
+  assert.equal(queryWithFilters(query, defaultFilters, 'newest'), '?origem=portfolio');
+  assert.equal(orderFromQuery('?ordem=invalida'), 'newest');
 });

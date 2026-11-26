@@ -4,7 +4,7 @@ Painel em React e TypeScript para acompanhar uma fila de incidentes. O exemplo u
 
 ![Painel com resumo de incidentes, gráfico diário e filtros](docs/painel.png)
 
-Os filtros aparecem na URL. Copie o endereço do navegador para compartilhar a visualização selecionada. Alterar um filtro atualiza o endereço sem criar uma nova entrada no histórico.
+Os filtros e a ordenação escolhida aparecem na URL. Copie o endereço do navegador para compartilhar a visualização selecionada. Alterar um filtro atualiza o endereço sem criar uma nova entrada no histórico.
 
 ## Executar
 
