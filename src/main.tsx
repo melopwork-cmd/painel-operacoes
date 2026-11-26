@@ -146,7 +146,7 @@ function App() {
               </select>
             </label>
             <label>Severidade
-              <select value={filters.severity} onChange={event => update('severity', event.target.value as Filters['severity'])}>
+              <select aria-label="Severidade" value={filters.severity} onChange={event => update('severity', event.target.value as Filters['severity'])}>
                 <option value="all">Todas as severidades</option>
                 {Object.entries(severities).map(([key, label]) => <option key={key} value={key}>{label}</option>)}
               </select>
