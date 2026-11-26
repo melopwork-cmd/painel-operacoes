@@ -131,7 +131,7 @@ function App() {
           </div>
           <div className="filters">
             <label className="search">Buscar
-              <input type="search" value={filters.search} placeholder="Título, serviço ou ID"
+              <input type="search" value={filters.search} placeholder="Título, resumo, serviço ou ID"
                      onChange={event => update('search', event.target.value)} />
             </label>
             <label>Status
