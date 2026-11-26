@@ -17,7 +17,7 @@ npm test
 npm run build
 ~~~
 
-Consulte o endereço local exibido pelo Vite. O painel tem uma interface responsiva, um diálogo nativo para detalhes e um CSV com separador ponto e vírgula para abertura em planilhas configuradas para português brasileiro.
+Consulte o endereço local exibido pelo Vite. O painel tem uma interface responsiva, um diálogo nativo para detalhes e exportação dos incidentes filtrados em JSON ou CSV. O CSV usa ponto e vírgula para planilhas configuradas para português brasileiro.
 
 A lógica de filtros, intervalos de data e CSV está em src/model.ts. Os testes cobrem busca sem acentos, datas de fronteira, dias sem incidentes e proteção contra fórmulas em células exportadas. A aplicação funciona como demonstração de frontend com dados incorporados.
 

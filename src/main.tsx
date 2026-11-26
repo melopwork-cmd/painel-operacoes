@@ -66,11 +66,13 @@ function App() {
     setFilters(current => ({ ...current, [key]: value }));
   }
 
-  function download() {
-    const url = URL.createObjectURL(new Blob([exportCsv(rows)], { type: 'text/csv;charset=utf-8' }));
+  function download(format: 'csv' | 'json') {
+    const contents = format === 'csv' ? exportCsv(rows) : JSON.stringify(rows, null, 2) + '\n';
+    const type = format === 'csv' ? 'text/csv;charset=utf-8' : 'application/json;charset=utf-8';
+    const url = URL.createObjectURL(new Blob([contents], { type }));
     const anchor = document.createElement('a');
     anchor.href = url;
-    anchor.download = 'incidentes.csv';
+    anchor.download = 'incidentes.' + format;
     anchor.click();
     window.setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
@@ -134,7 +136,8 @@ function App() {
             <h2 id="incident-title">Incidentes</h2>
             <div className="table-actions">
               {hasFilters && <button className="secondary" type="button" onClick={() => setFilters(defaultFilters)}>Limpar filtros</button>}
-              <button className="secondary" type="button" disabled={rows.length === 0} onClick={download}>Exportar CSV</button>
+              <button className="secondary" type="button" disabled={rows.length === 0} onClick={() => download('csv')}>Exportar CSV</button>
+              <button className="secondary" type="button" disabled={rows.length === 0} onClick={() => download('json')}>Exportar JSON</button>
             </div>
           </div>
           <div className="filters">
