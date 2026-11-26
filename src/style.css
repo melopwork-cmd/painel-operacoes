@@ -85,3 +85,7 @@ dialog > p { color: #415c65; line-height: 1.55; }
   .axis-label { font-size: 8px; }.filters { padding-inline: 12px; gap: 8px; grid-template-columns: 1fr 1fr; }
   .search { grid-column: 1 / -1; }
 }
+
+.table-controls { display: flex; justify-content: flex-end; padding: 0 20px 16px; }
+.table-controls label { display: grid; gap: 5px; }
+@media (max-width: 610px) { .table-controls { padding-inline: 12px; } }
