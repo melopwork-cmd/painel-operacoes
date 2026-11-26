@@ -1,11 +1,12 @@
 import { StrictMode, useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { incidents } from './incidents.ts';
-import { dailyCounts, dateLabel, exportCsv, filterIncidents, phases, services, severities, snapshot } from './model.ts';
+import {
+  dailyCounts, dateLabel, defaultFilters, exportCsv, filterIncidents, filtersFromQuery,
+  phases, queryWithFilters, services, severities, snapshot,
+} from './model.ts';
 import type { Filters, Incident } from './model.ts';
 import './style.css';
-
-const defaultFilters: Filters = { days: 14, phase: 'all', service: 'all', search: '' };
 
 function Details({ incident, onClose }: { incident: Incident; onClose: () => void }) {
   const dialog = useRef<HTMLDialogElement>(null);
@@ -30,8 +31,22 @@ function Details({ incident, onClose }: { incident: Incident; onClose: () => voi
 }
 
 function App() {
-  const [filters, setFilters] = useState<Filters>(defaultFilters);
+  const [filters, setFilters] = useState<Filters>(() => filtersFromQuery(window.location.search));
   const [selected, setSelected] = useState<Incident | null>(null);
+  useEffect(() => {
+    const onNavigate = () => setFilters(filtersFromQuery(window.location.search));
+    window.addEventListener('popstate', onNavigate);
+    return () => window.removeEventListener('popstate', onNavigate);
+  }, []);
+
+  useEffect(() => {
+    const next = queryWithFilters(window.location.search, filters);
+    if (next !== window.location.search) {
+      const route = window.location.pathname + next + window.location.hash;
+      window.history.replaceState(window.history.state, '', route);
+    }
+  }, [filters]);
+
   const rows = filterIncidents(incidents, filters);
   const trend = dailyCounts(rows, filters.days);
   const max = Math.max(1, ...trend.map(day => day.total));

@@ -19,10 +19,35 @@ export type Filters = {
   search: string;
 };
 
+export const defaultFilters: Filters = { days: 14, phase: 'all', service: 'all', search: '' };
 export const snapshot = '2026-11-26';
 export const phases: Record<Phase, string> = { open: 'Aberto', monitoring: 'Monitorando', resolved: 'Resolvido' };
 export const severities: Record<Severity, string> = { critical: 'Crítica', major: 'Alta', minor: 'Moderada' };
 export const services: Service[] = ['Pagamentos', 'API pública', 'Identidade', 'Notificações'];
+
+export function filtersFromQuery(query: string): Filters {
+  const params = new URLSearchParams(query);
+  const days = Number(params.get('dias'));
+  const phase = params.get('status') ?? '';
+  const service = services.find(value => value === params.get('servico'));
+  return {
+    days: days === 7 || days === 14 || days === 30 ? days : defaultFilters.days,
+    phase: Object.hasOwn(phases, phase) ? phase as Phase : defaultFilters.phase,
+    service: service ?? defaultFilters.service,
+    search: params.get('q') ?? defaultFilters.search,
+  };
+}
+
+export function queryWithFilters(query: string, filters: Filters): string {
+  const params = new URLSearchParams(query);
+  const keys = { days: 'dias', phase: 'status', service: 'servico', search: 'q' } as const;
+  for (const key of Object.keys(keys) as (keyof Filters)[]) {
+    if (filters[key] === defaultFilters[key]) params.delete(keys[key]);
+    else params.set(keys[key], String(filters[key]));
+  }
+  const search = params.toString();
+  return search ? '?' + search : '';
+}
 
 const dayMs = 86_400_000;
 const parseDay = (date: string) => Date.parse(date + 'T00:00:00Z');
