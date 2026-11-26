@@ -3,7 +3,7 @@ import test from 'node:test';
 import { incidents } from '../src/incidents.ts';
 import { orderIncidents, dailyCounts, defaultFilters, exportCsv, filterIncidents, filtersFromQuery, queryWithFilters } from '../src/model.ts';
 
-const options = { days: 14, phase: 'all', service: 'all', search: '' };
+const options = defaultFilters;
 
 test('search and service filters compose and ignore accents', () => {
   const rows = filterIncidents(incidents, { ...options, search: 'latencia', service: 'API pública' });
@@ -25,7 +25,7 @@ test('chart preserves zero days and separates the resolved count', () => {
 });
 
 test('shareable filters round-trip and clearing them preserves other parameters', () => {
-  const filters = { days: 7, phase: 'open', service: 'API pública', search: 'latência' };
+  const filters = { days: 7, phase: 'open', severity: 'critical', service: 'API pública', search: 'latência' };
   const query = queryWithFilters('?utm_source=portfolio', filters);
   assert.deepEqual(filtersFromQuery(query), filters);
   assert.equal(queryWithFilters(query, defaultFilters), '?utm_source=portfolio');
@@ -48,4 +48,13 @@ test('incident order supports oldest first and severity without mutating the inp
   assert.deepEqual(orderIncidents(rows, 'severity').map(row => row.id),
     ['latest-critical', 'older-critical', 'latest-major']);
   assert.equal(rows[0].id, 'latest-major');
+});
+
+test('severity narrows results and persists in a shared link', () => {
+  const filters = filtersFromQuery('?severidade=critical');
+  const rows = filterIncidents(incidents, filters);
+  assert(rows.length > 0);
+  assert(rows.every(row => row.severity === 'critical'));
+  assert.equal(queryWithFilters('', filters), '?severidade=critical');
+  assert.equal(filtersFromQuery('?severidade=invalid').severity, 'all');
 });

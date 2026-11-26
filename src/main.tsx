@@ -140,6 +140,12 @@ function App() {
                 {Object.entries(phases).map(([key, label]) => <option key={key} value={key}>{label}</option>)}
               </select>
             </label>
+            <label>Severidade
+              <select value={filters.severity} onChange={event => update('severity', event.target.value as Filters['severity'])}>
+                <option value="all">Todas as severidades</option>
+                {Object.entries(severities).map(([key, label]) => <option key={key} value={key}>{label}</option>)}
+              </select>
+            </label>
             <label>Serviço
               <select aria-label="Serviço" value={filters.service} onChange={event => update('service', event.target.value as Filters['service'])}>
                 <option value="all">Todos os serviços</option>

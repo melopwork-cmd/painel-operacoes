@@ -16,11 +16,12 @@ export type Incident = {
 export type Filters = {
   days: 7 | 14 | 30;
   phase: Phase | 'all';
+  severity: Severity | 'all';
   service: Service | 'all';
   search: string;
 };
 
-export const defaultFilters: Filters = { days: 14, phase: 'all', service: 'all', search: '' };
+export const defaultFilters: Filters = { days: 14, phase: 'all', severity: 'all', service: 'all', search: '' };
 export const snapshot = '2026-11-26';
 export const phases: Record<Phase, string> = { open: 'Aberto', monitoring: 'Monitorando', resolved: 'Resolvido' };
 export const severities: Record<Severity, string> = { critical: 'Crítica', major: 'Alta', minor: 'Moderada' };
@@ -30,10 +31,12 @@ export function filtersFromQuery(query: string): Filters {
   const params = new URLSearchParams(query);
   const days = Number(params.get('dias'));
   const phase = params.get('status') ?? '';
+  const severity = params.get('severidade') ?? '';
   const service = services.find(value => value === params.get('servico'));
   return {
     days: days === 7 || days === 14 || days === 30 ? days : defaultFilters.days,
     phase: Object.hasOwn(phases, phase) ? phase as Phase : defaultFilters.phase,
+    severity: Object.hasOwn(severities, severity) ? severity as Severity : defaultFilters.severity,
     service: service ?? defaultFilters.service,
     search: params.get('q') ?? defaultFilters.search,
   };
@@ -41,7 +44,7 @@ export function filtersFromQuery(query: string): Filters {
 
 export function queryWithFilters(query: string, filters: Filters): string {
   const params = new URLSearchParams(query);
-  const keys = { days: 'dias', phase: 'status', service: 'servico', search: 'q' } as const;
+  const keys = { days: 'dias', phase: 'status', severity: 'severidade', service: 'servico', search: 'q' } as const;
   for (const key of Object.keys(keys) as (keyof Filters)[]) {
     if (filters[key] === defaultFilters[key]) params.delete(keys[key]);
     else params.set(keys[key], String(filters[key]));
@@ -65,6 +68,7 @@ export function filterIncidents(incidents: Incident[], filters: Filters) {
   return incidents
     .filter(item => parseDay(item.date) >= start && parseDay(item.date) <= end)
     .filter(item => filters.phase === 'all' || item.phase === filters.phase)
+    .filter(item => filters.severity === 'all' || item.severity === filters.severity)
     .filter(item => filters.service === 'all' || item.service === filters.service)
     .filter(item => !query || clean([item.id, item.title, item.service].join(' ')).includes(query))
     .sort((a, b) => b.date.localeCompare(a.date) || b.id.localeCompare(a.id));
