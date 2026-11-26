@@ -47,7 +47,12 @@ export function orderFromQuery(query: string): IncidentOrder {
   return order === 'oldest' || order === 'severity' || order === 'service' ? order : 'newest';
 }
 
-export function queryWithFilters(query: string, filters: Filters, order?: IncidentOrder): string {
+export function incidentFromQuery(query: string, incidents: Incident[]): Incident | null {
+  const id = new URLSearchParams(query).get('incidente');
+  return incidents.find(incident => incident.id === id) ?? null;
+}
+
+export function queryWithFilters(query: string, filters: Filters, order?: IncidentOrder, incidentId?: string | null): string {
   const params = new URLSearchParams(query);
   const keys = { days: 'dias', phase: 'status', severity: 'severidade', service: 'servico', search: 'q' } as const;
   for (const key of Object.keys(keys) as (keyof Filters)[]) {
@@ -56,6 +61,8 @@ export function queryWithFilters(query: string, filters: Filters, order?: Incide
   }
   if (order === 'newest') params.delete('ordem');
   else if (order) params.set('ordem', order);
+  if (incidentId === null) params.delete('incidente');
+  else if (incidentId) params.set('incidente', incidentId);
   const search = params.toString();
   return search ? '?' + search : '';
 }

@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { incidents } from '../src/incidents.ts';
-import { orderFromQuery, orderIncidents, dailyCounts, defaultFilters, exportCsv, filterIncidents, filtersFromQuery, queryWithFilters } from '../src/model.ts';
+import { incidentFromQuery, orderFromQuery, orderIncidents, dailyCounts, defaultFilters, exportCsv, filterIncidents, filtersFromQuery, queryWithFilters } from '../src/model.ts';
 
 const options = defaultFilters;
 
@@ -36,6 +36,15 @@ test('CSV escapes quotes and neutralizes cells interpreted as spreadsheet formul
   const csv = exportCsv([{ ...incidents[0], title: ' =2+2;"x"' }]);
   assert(csv.startsWith('\ufeff"ID";"Incidente"'));
   assert(csv.includes("\"' =2+2;\"\"x\"\"\""));
+});
+
+test('incident links retain filters and ignore unknown incident IDs', () => {
+  const incident = incidents[0];
+  const query = queryWithFilters('?origem=portfolio', { ...defaultFilters, days: 7 }, 'oldest', incident.id);
+  assert.equal(incidentFromQuery(query, incidents), incident);
+  assert.equal(filtersFromQuery(query).days, 7);
+  assert.equal(incidentFromQuery('?incidente=unknown', incidents), null);
+  assert.equal(queryWithFilters(query, defaultFilters, 'newest', null), '?origem=portfolio');
 });
 
 test('incident order supports oldest first and severity without mutating the input', () => {
