@@ -10,6 +10,13 @@ test('search and service filters compose and ignore accents', () => {
   assert.deepEqual(rows.map(row => row.id), ['INC-115', 'INC-113']);
 });
 
+test('active includes open and monitoring incidents and survives a shared URL', () => {
+  const filters = filtersFromQuery('?status=active');
+  const rows = filterIncidents(incidents, filters);
+  assert.deepEqual(new Set(rows.map(row => row.phase)), new Set(['open', 'monitoring']));
+  assert.equal(queryWithFilters('', filters), '?status=active');
+});
+
 test('date range includes the first day and excludes older records', () => {
   const rows = filterIncidents(incidents, { ...options, days: 7 });
   assert(rows.some(row => row.date === '2026-11-20'));
