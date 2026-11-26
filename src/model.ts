@@ -105,17 +105,6 @@ export function dailyCounts(incidents: Incident[], days = 7) {
   });
 }
 
-export function countByService(rows: Incident[]) {
-  const counts = new Map<Service, { service: Service; total: number; active: number }>();
-  for (const { service, phase } of rows) {
-    const entry = counts.get(service) ?? { service, total: 0, active: 0 };
-    entry.total++;
-    entry.active += Number(phase !== 'resolved');
-    counts.set(service, entry);
-  }
-  return [...counts.values()].sort((a, b) => b.total - a.total || a.service.localeCompare(b.service, 'pt-BR'));
-}
-
 function csvCell(value: string) {
   const safe = /^[\u0000-\u0020]*[=+\-@]|^[\t\r\n]/.test(value) ? "'" + value : value;
   return '"' + safe.replace(/"/g, '""') + '"';

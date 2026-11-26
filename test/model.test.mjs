@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { incidents } from '../src/incidents.ts';
-import { countByService, orderFromQuery, orderIncidents, dailyCounts, defaultFilters, exportCsv, filterIncidents, filtersFromQuery, queryWithFilters } from '../src/model.ts';
+import { orderFromQuery, orderIncidents, dailyCounts, defaultFilters, exportCsv, filterIncidents, filtersFromQuery, queryWithFilters } from '../src/model.ts';
 
 const options = defaultFilters;
 
@@ -30,19 +30,6 @@ test('shareable filters round-trip and clearing them preserves other parameters'
   assert.deepEqual(filtersFromQuery(query), filters);
   assert.equal(queryWithFilters(query, defaultFilters), '?utm_source=portfolio');
   assert.deepEqual(filtersFromQuery('?dias=90&status=constructor&servico=unknown'), defaultFilters);
-});
-
-test('service breakdown counts active and resolved incidents independently', () => {
-  const rows = [
-    { ...incidents[0], service: 'Pagamentos', phase: 'resolved' },
-    { ...incidents[0], service: 'Pagamentos', phase: 'monitoring' },
-    { ...incidents[0], service: 'Identidade', phase: 'open' },
-  ];
-  assert.deepEqual(countByService(rows), [
-    { service: 'Pagamentos', total: 2, active: 1 },
-    { service: 'Identidade', total: 1, active: 1 },
-  ]);
-  assert.deepEqual(countByService([]), []);
 });
 
 test('CSV escapes quotes and neutralizes cells interpreted as spreadsheet formulas', () => {

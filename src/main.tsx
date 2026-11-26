@@ -3,9 +3,10 @@ import { createRoot } from 'react-dom/client';
 import { incidents } from './incidents.ts';
 import {
   orderFromQuery, orderIncidents, dailyCounts, dateLabel, defaultFilters, exportCsv, filterIncidents, filtersFromQuery,
-  countByService, phases, queryWithFilters, services, severities, snapshot,
+  phases, queryWithFilters, services, severities, snapshot,
 } from './model.ts';
 import type { Filters, Incident } from './model.ts';
+import { countByService } from './service-breakdown.ts';
 import './style.css';
 
 function Details({ incident, onClose }: { incident: Incident; onClose: () => void }) {
