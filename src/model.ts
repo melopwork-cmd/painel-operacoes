@@ -64,13 +64,17 @@ export function dateLabel(date: string) {
 export function filterIncidents(incidents: Incident[], filters: Filters) {
   const end = parseDay(snapshot);
   const start = end - (filters.days - 1) * dayMs;
-  const query = clean(filters.search);
+  const terms = clean(filters.search).split(/\s+/u).filter(Boolean);
   return incidents
     .filter(item => parseDay(item.date) >= start && parseDay(item.date) <= end)
     .filter(item => filters.phase === 'all' || item.phase === filters.phase)
     .filter(item => filters.severity === 'all' || item.severity === filters.severity)
     .filter(item => filters.service === 'all' || item.service === filters.service)
-    .filter(item => !query || clean([item.id, item.title, item.service].join(' ')).includes(query))
+    .filter(item => {
+      if (!terms.length) return true;
+      const text = clean([item.id, item.title, item.service, item.summary].join(' '));
+      return terms.every(term => text.includes(term));
+    })
     .sort((a, b) => b.date.localeCompare(a.date) || b.id.localeCompare(a.id));
 }
 

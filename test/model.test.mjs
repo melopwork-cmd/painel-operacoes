@@ -7,7 +7,7 @@ const options = defaultFilters;
 
 test('search and service filters compose and ignore accents', () => {
   const rows = filterIncidents(incidents, { ...options, search: 'latencia', service: 'API pública' });
-  assert.deepEqual(rows.map(row => row.id), ['INC-115']);
+  assert.deepEqual(rows.map(row => row.id), ['INC-115', 'INC-113']);
 });
 
 test('date range includes the first day and excludes older records', () => {
@@ -57,4 +57,10 @@ test('severity narrows results and persists in a shared link', () => {
   assert(rows.every(row => row.severity === 'critical'));
   assert.equal(queryWithFilters('', filters), '?severidade=critical');
   assert.equal(filtersFromQuery('?severidade=invalid').severity, 'all');
+});
+
+test('search matches all terms across separate incident fields', () => {
+  const example = { ...incidents[0], title: 'Falha', summary: 'Conexão instável no banco' };
+  assert.deepEqual(filterIncidents([example], { ...defaultFilters, search: 'instavel   FALHA' }), [example]);
+  assert.deepEqual(filterIncidents([example], { ...defaultFilters, search: 'instável desconhecido' }), []);
 });
