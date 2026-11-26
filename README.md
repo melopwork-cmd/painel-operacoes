@@ -1,6 +1,6 @@
 # Painel de Operações
 
-Painel em React e TypeScript para acompanhar uma fila de incidentes. O exemplo usa dados simulados e uma data de referência fixa. O período, a busca, o serviço e o status filtram a tabela, os indicadores, o gráfico e o CSV.
+Painel em React e TypeScript para acompanhar uma fila de incidentes. O exemplo usa dados simulados e uma data de referência fixa. O período, a busca, o serviço e o status filtram a tabela, os indicadores, o gráfico e o CSV. O resumo por serviço mostra o volume e quantos incidentes continuam em andamento.
 
 ![Painel com resumo de incidentes, gráfico diário e filtros](docs/painel.png)
 
